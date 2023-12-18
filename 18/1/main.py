@@ -1,3 +1,4 @@
+from collections import deque
 import numpy as np
 import re
 
@@ -49,6 +50,20 @@ for direction, distance, color in plan:
         min_u = min(min_u, r)
         max_d = max(max_d, r + 1)
 
+q = deque([(r - 1, c + 1)])
+while q:
+    r, c = q.popleft()
+    if data[r, c] == 0:
+        data[r, c] = 1
+        if r > 0 and data[r - 1, c] == 0:
+            q.append((r - 1, c))
+        if c < data.shape[1] - 1 and data[r, c + 1] == 0:
+            q.append((r, c + 1))
+        if r < data.shape[0] - 1 and data[r + 1, c] == 0:
+            q.append((r + 1, c))
+        if c > 0 and data[r, c - 1] == 0:
+            q.append((r, c - 1))
+
 # Trim grid to actual bounds
 data = np.delete(data, np.s_[0:min_u], 0)
 data = np.delete(data, np.s_[max_d - min_u:], 0)
@@ -61,4 +76,5 @@ for row_i, row in enumerate(data):
         row_string += str(int(e))
     print(row_string)
 
+print()
 print(np.sum(data))
