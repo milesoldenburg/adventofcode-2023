@@ -1,3 +1,4 @@
+import math
 import re
 
 instruction_pattern = re.compile(r'([RL]+)\n\n', flags=re.MULTILINE)
@@ -17,25 +18,23 @@ for n in network_text.splitlines():
     networks[node] = (left_node, right_node)
 
 starting_nodes = [x for x in networks if x.endswith('A')]
+node_steps = []
 
-steps = 0
-all_nodes_match = False
-while not all_nodes_match:
-    for c in instructions:
-        checking_nodes = []
-        for n in starting_nodes:
+for n in starting_nodes:
+    steps = 0
+    node = n
+    while not node.endswith('Z'):
+        for c in instructions:
             if c == 'L':
-                checking_nodes.append(networks[n][0])
+                node = networks[node][0]
+                steps += 1
+                if node.endswith('Z'):
+                    break
             elif c == 'R':
-                checking_nodes.append(networks[n][1])
-        steps += 1
-        all_nodes_match = True
-        for checking_node in checking_nodes:
-            if not checking_node.endswith('Z'):
-                all_nodes_match = False
-                break
-        if all_nodes_match:
-            break
-        starting_nodes = checking_nodes
+                node = networks[node][1]
+                steps += 1
+                if node.endswith('Z'):
+                    break
+    node_steps.append(steps)
 
-print(steps)
+print(math.lcm(*node_steps))
